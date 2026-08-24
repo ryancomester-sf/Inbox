@@ -182,8 +182,11 @@
   min-width: 0;
 }
 [data-row-style="v2"] .tli2-name {
-  font-weight: 700;
-  font-size: 13.5px;
+  /* 700 -> medium (500) -> semi-bold (600) per explicit requests. */
+  font-weight: 600;
+  /* Matches the real app's own `.tli__name` (see app-main.css) exactly,
+     rather than the earlier eyeballed 13.5px. */
+  font-size: 12.5px;
   color: var(--lite-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -191,7 +194,9 @@
   flex: 0 1 auto;
 }
 [data-row-style="v2"] .tli2-mailbox {
-  font-size: 11px;
+  /* Matches the real app's own `.tli__mailbox` exactly, rather than the
+     earlier eyeballed 11px. */
+  font-size: 8.5px;
   color: var(--lite-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -203,7 +208,9 @@
   margin-left: auto;
   padding-left: 8px;
   flex-shrink: 0;
-  font-size: 11px;
+  /* Matches the real app's own `.tli__time` exactly, rather than the
+     earlier eyeballed 11px. */
+  font-size: 10px;
   color: var(--lite-text-muted);
   white-space: nowrap;
 }
@@ -220,7 +227,11 @@
 [data-row-style="v2"] .tli2-line2-text {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: 12.5px;
+  /* Matches the real app's own `.tli__preview` exactly, rather than the
+     earlier eyeballed 12.5px. .tli2-subject (the bold lead-in span
+     inside this text) has no font-size of its own, so it inherits this
+     too. */
+  font-size: 11.5px;
   color: var(--lite-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -265,7 +276,9 @@
   color: var(--lite-bg-primary);
 }
 [data-row-style="v2"] .tli2-subject {
-  font-weight: 700;
+  /* Reduced from 700 -> 600 -> medium (500) per explicit request, same
+     weight as .tli2-name now. */
+  font-weight: 500;
   color: var(--lite-text-primary);
 }
 
