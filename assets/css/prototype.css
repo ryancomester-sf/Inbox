@@ -1,0 +1,572 @@
+/*
+ * prototype.css
+ * ---------------------------------------------------------------
+ * Loaded LAST, after the real production stylesheets extracted from
+ * the .mhtml snapshot (app-main.css etc). Nothing in those files
+ * should be hand-edited -- they're a straight dump of what shipped
+ * to production. Put every prototype tweak, and all new hover-state
+ * work, in here (or split into more files under assets/css/ and
+ * link them after this one) so a diff against the real app stays easy.
+ * ---------------------------------------------------------------
+ */
+
+/* The Aircall call-widget iframe was stubbed out (see build.py) since
+   the widget was already hidden in the captured snapshot. Belt and
+   braces: keep it fully out of the way regardless of future markup
+   changes. */
+[data-note="Aircall workspace iframe stubbed out for the prototype"] {
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------
+ * Ticket list row (.tli) hover behaviour starts here.
+ * The real app already ships a plain `.tli:hover { background }`
+ * rule (see app-main.css) -- this is the place to layer on
+ * hover-revealed row actions, quick-action icons, etc.
+ * ------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------
+ * List-row redesign: default channel icon -> hover checkbox ->
+ * selected (filled) checkbox, Gmail-style. Built from the Figma
+ * wireframes (structure: leading icon + two-line name/subject
+ * block) and the Gmail screenshots (the icon-to-checkbox
+ * interaction). Colors are all pulled from the app's own tokens --
+ * nothing here is a Gmail/Figma-wireframe color.
+ *
+ * Scoped to [data-row-style="v2"] .tli, which today is only the
+ * "List" state (see app.js) -- the rest of the app/prototype is
+ * untouched.
+ * ------------------------------------------------------------- */
+/* Each row is still wrapped in the captured react-window virtualization
+   div, which carries its own inline `position: absolute; height: 66px;
+   transform: translateY(Npx)` sized for the ORIGINAL 66px-tall row. Our
+   72px row no longer fits that box: every row bled 6px into the next
+   row's fixed slot, compounding down the list -- the real cause of the
+   uneven top/bottom spacing and the misaligned-looking rows. There's no
+   real virtualization running here (every row is already in the DOM),
+   so just take these wrappers out of absolute/fixed-height positioning
+   entirely and let them stack in normal flow. */
+[data-row-style="v2"] [data-react-window-index] {
+  position: static !important;
+  transform: none !important;
+  height: auto !important;
+  width: auto !important;
+}
+
+[data-row-style="v2"] .tli {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: auto;
+  min-height: 72px;
+  padding: 10px 14px;
+}
+
+[data-row-style="v2"] .tli2-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  /* default (no hover/selected): the ticket's real per-channel colour,
+     handed in by app.js as custom properties -- see the note there on
+     why these aren't set as plain `background`/`color` inline styles. */
+  background: var(--tli2-channel-bg);
+  color: var(--tli2-channel-color);
+}
+
+[data-row-style="v2"] .tli2-icon-channel,
+[data-row-style="v2"] .tli2-icon-hover,
+[data-row-style="v2"] .tli2-icon-selected {
+  display: none;
+  width: 20px;
+  height: 20px;
+}
+[data-row-style="v2"] .tli2-icon-channel svg,
+[data-row-style="v2"] .tli2-icon-hover svg,
+[data-row-style="v2"] .tli2-icon-selected svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* default: the ticket's real channel icon (Email/Instagram/WhatsApp/...) */
+[data-row-style="v2"] .tli2-icon-channel { display: flex; }
+
+/* hover: swap to a plain, uncoloured checkbox outline -- nothing selected yet */
+[data-row-style="v2"] .tli:hover .tli2-icon-channel { display: none; }
+[data-row-style="v2"] .tli:hover .tli2-icon-hover {
+  display: flex;
+  color: var(--lite-text-secondary);
+}
+[data-row-style="v2"] .tli:hover .tli2-icon {
+  /* Pure white, not the muted --lite-bg-tertiary hover tint, so the grey
+     checkbox outline actually contrasts against its circle. */
+  background: #fff;
+}
+
+/* checked (checkbox clicked): filled checkbox in the app's own accent
+   colour. This is `.tli--checked`, NOT `.tli--active` -- `.tli--active` is
+   the real app's class for "this row's ticket is open" (see the
+   ticket-open section below), and the two are deliberately independent:
+   any number of rows can be checked while at most one is open.
+   !important beats the plain :hover rules above so a checked row that's
+   also being hovered still shows the checked state, not the empty box. */
+[data-row-style="v2"] .tli--checked .tli2-icon-channel,
+[data-row-style="v2"] .tli--checked .tli2-icon-hover {
+  display: none !important;
+}
+[data-row-style="v2"] .tli--checked .tli2-icon-selected {
+  display: flex !important;
+  color: #fff;
+}
+[data-row-style="v2"] .tli--checked .tli2-icon {
+  background: var(--lite-accent) !important;
+}
+/* The row itself gets a soft accent tint too, not just the checkbox --
+   same rgba-over-accent pattern the app already uses for channel-icon
+   backgrounds (e.g. Email's rgba(99,102,241,0.12)), just applied to the
+   whole row so a checked ticket actually reads as highlighted in the
+   list, not only via its checkbox. Wins over plain hover/read-state
+   backgrounds so it stays visible while hovering a checked row. */
+[data-row-style="v2"] .tli--checked {
+  background: rgba(207, 147, 88, 0.12) !important;
+}
+
+/* Opening a ticket also drops its accent-coloured left border, on top of
+   the .tli--unread removal in app.js: the real app's own CSS colours
+   that border for `.tli--active` too (an "open thread" indicator, same
+   colour as unread), which read as a stray leftover unread stripe once
+   this design already shows "open" via the highlighted row background
+   instead. */
+[data-row-style="v2"] .tli--active {
+  border-left-color: transparent !important;
+}
+
+[data-row-style="v2"] .tli2-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+[data-row-style="v2"] .tli2-line1 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+[data-row-style="v2"] .tli2-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--lite-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+}
+[data-row-style="v2"] .tli2-mailbox {
+  font-size: 11px;
+  color: var(--lite-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+[data-row-style="v2"] .tli2-time {
+  margin-left: auto;
+  padding-left: 8px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--lite-text-muted);
+  white-space: nowrap;
+}
+/* Subject/preview text + agent avatar stack side by side, vertically
+   centered together by ordinary flexbox -- not the text positioned by
+   flow with the avatars separately absolute-positioned against the row,
+   which is what let them drift out of alignment with each other. */
+[data-row-style="v2"] .tli2-line2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+[data-row-style="v2"] .tli2-line2-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--lite-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Agent avatar stack: who's currently in this conversation, right at the
+   end of the subject/preview line. Up to 2 avatars, then a "+N" circle
+   for the rest. */
+[data-row-style="v2"] .tli2-agents {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+[data-row-style="v2"] .tli2-agent-avatar,
+[data-row-style="v2"] .tli2-agent-more {
+  /* Explicit, rather than relying on the app's generic
+     `[data-tooltip] { position: relative }` rule to cascade through --
+     something about this element wasn't picking that up, so the
+     data-tooltip hover bubble (see app.js) had no positioning context
+     and never rendered. */
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: 4px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+[data-row-style="v2"] .tli2-agents > :first-child {
+  margin-left: 0;
+}
+[data-row-style="v2"] .tli2-agent-more {
+  background: var(--lite-text-muted);
+  color: var(--lite-bg-primary);
+}
+[data-row-style="v2"] .tli2-subject {
+  font-weight: 700;
+  color: var(--lite-text-primary);
+}
+
+/* ---------------------------------------------------------------
+ * Opening a ticket from the List state: clicking a row anywhere
+ * outside its checkbox reveals the real reading pane + contact panel,
+ * grafted on at build time from the "Ticket open" capture (see
+ * build_single.py's enhance_list_panel) -- same markup, same CSS,
+ * just relocated. Hidden until `.tli-ticket-open` is toggled on the
+ * [data-row-style="v2"] root by app.js.
+ * ------------------------------------------------------------- */
+/* !important because the reading pane / contact panel divs still carry
+   their original captured `style="...display:flex..."` inline styles
+   (needed for their internal flex layout), which would otherwise beat a
+   plain `display:none` here regardless of selector specificity. */
+[data-row-style="v2"] .tli-reading-pane,
+[data-row-style="v2"] .tli-contact-panel {
+  display: none !important;
+}
+[data-row-style="v2"].tli-ticket-open .tli-reading-pane {
+  display: flex !important;
+}
+[data-row-style="v2"].tli-ticket-open .tli-contact-panel {
+  display: flex !important;
+}
+/* Same story for the bulk-select bar and the search box it replaces: the
+   real `.ticket-bulk-bar { display: flex }` / `.lite-autocomplete` rules
+   beat the browser's native `[hidden] { display: none }` UA rule once
+   both are author-stylesheet rules of equal specificity. */
+[data-row-style="v2"] [hidden] {
+  display: none !important;
+}
+/* Ticket list column goes from "fill all available width" to the same
+   fixed narrow column the real "Ticket open" capture uses, once a
+   reading pane needs the rest of the space. */
+[data-row-style="v2"].tli-ticket-open .tli-list-col {
+  width: 340px !important;
+  min-width: 300px !important;
+  max-width: 340px !important;
+  flex-shrink: 0 !important;
+}
+
+
+
+/* ---------------------------------------------------------------
+ * Bulk-bar property dropdowns (Status/Assignee/Folder/Snooze), built
+ * and positioned by app.js. Appended to <body>, not scoped to
+ * [data-row-style="v2"] -- these aren't part of any one state's DOM.
+ * Colours are the app's own light-theme tokens (the reference
+ * screenshots happen to already use this same warm palette).
+ * ------------------------------------------------------------- */
+.tli-dropdown {
+  position: fixed;
+  z-index: 100001;
+  background: var(--lite-bg-secondary);
+  border: 1px solid var(--lite-border);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  min-width: 230px;
+  max-width: 300px;
+  padding: 6px 0 8px;
+  font-family: inherit;
+}
+.tli-dropdown__label {
+  padding: 10px 20px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--lite-text-muted);
+}
+.tli-dropdown__divider {
+  height: 1px;
+  margin: 0 0 4px;
+  background: var(--lite-border);
+}
+.tli-dropdown__list {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.tli-dropdown__item {
+  padding: 13px 20px;
+  font-size: 15px;
+  color: var(--lite-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tli-dropdown__item:hover {
+  background: var(--lite-bg-tertiary);
+}
+
+/* Search box (Assignee) -- sits between the label and the divider. */
+.tli-dropdown__search {
+  padding: 0 16px 8px;
+}
+.tli-dropdown__search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--lite-text-primary);
+  background: var(--lite-bg-primary);
+  border: 1px solid var(--lite-border);
+  border-radius: 8px;
+  outline: none;
+}
+.tli-dropdown__search-input:focus {
+  border-color: var(--lite-accent);
+}
+
+/* Status item: coloured dot or icon + label. */
+.tli-dropdown__status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tli-dropdown__status-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tli-dropdown__status-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.tli-dropdown__status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Assignee item: initials avatar (same colour-from-name scheme as the
+   row's own agent avatar stack) + name. */
+.tli-dropdown__assignee-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tli-dropdown__assignee-avatar {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------
+ * Bulk-action bar restyle (Status/Assignee/Folder/Snooze/Export).
+ * NOTE: this exact block has been silently wiped from this file
+ * twice now by something outside this conversation, each time
+ * reverting several explicit, still-standing requests (gray
+ * background, breathing room, the divider after Status, bigger
+ * text/icons, and now black text/icon colour instead of the real
+ * app's orange accent). If you're reading this because it's
+ * disappeared a third time: it wasn't asked for in chat -- restore
+ * from here rather than leaving it reverted.
+ *
+ * - Gray background (`#E9E9E6`), not the app's warm cream tokens,
+ *   which were blending into the page (low contrast).
+ * - Generous padding/gaps -- more breathing room than the real
+ *   `.ticket-bulk-bar` (6px 8px / 6px gap).
+ * - Buttons: black text/icons (var(--lite-text-primary), the same
+ *   colour as a ticket row's bold name) instead of the real
+ *   `.lite-button--secondary`'s orange-on-orange-border; border
+ *   goes neutral gray to match rather than clashing with black text.
+ * - A divider right after "Status", separating it from the rest --
+ *   hidden when the list column is narrowed (a ticket is open): at
+ *   that width Status usually ends up alone on its own wrapped line,
+ *   where a trailing divider has nothing to visually separate.
+ * - Rounded corners on the bar itself.
+ * ------------------------------------------------------------- */
+[data-row-style="v2"] .ticket-bulk-bar {
+  background: #E9E9E6;
+  /* Top/bottom matches the real app's own `.ticket-bulk-bar` padding
+     (6px 8px in app-main.css) -- horizontal stays wider for breathing
+     room, only the vertical value is meant to match the real size. */
+  padding: 6px 18px;
+  gap: 24px;
+  border-bottom: 1px solid var(--lite-border);
+  border-radius: 12px;
+}
+
+/* "Select all" checkbox + label + count + clear(x): tightened back up
+   into their own group so the gap above reads as intentional spacing
+   between groups, not just uniformly loose everywhere. */
+[data-row-style="v2"] .ticket-bulk-bar .lite-checkbox,
+[data-row-style="v2"] .ticket-bulk-bar__select-all,
+[data-row-style="v2"] .ticket-bulk-bar__count {
+  margin-right: -12px;
+}
+
+/* "Select all" + count: bigger text, matching the property buttons'
+   14px rather than the real (~11px) size. */
+[data-row-style="v2"] .ticket-bulk-bar__select-all,
+[data-row-style="v2"] .ticket-bulk-bar__count {
+  font-size: 14px;
+}
+
+/* Clear-selection (x) button, wide view: a bit bigger than the real
+   24px/14px `.lite-icon-button--mini`, but pulled back down from an
+   earlier 32px/18px pass -- reads oversized at this width. The narrow
+   (ticket-open) view overrides this again, smaller still -- see the
+   `[data-bulk-action="clear"]` rule below. */
+[data-row-style="v2"] .ticket-bulk-bar > .lite-icon-button {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+}
+[data-row-style="v2"] .ticket-bulk-bar > .lite-icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Divider right after "Status": a real flex child (not a pseudo-element
+   positioned with top:50%/translateY(-50%)) so the bar's own
+   `align-items: center` centers it the same simple way it centers every
+   other item -- no dependence on guessing the button's exact rendered
+   height, which is what made the old absolutely-positioned version sit
+   too high in some layouts. */
+[data-row-style="v2"] .tli-bulkbar-divider {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+  align-self: center;
+  /* var(--lite-border) is a light warm gray almost identical to the
+     bar's own #E9E9E6 background -- invisible against it. Something
+     visibly darker instead. */
+  background: var(--lite-text-muted);
+}
+/* Not needed once the list column narrows (a ticket is open) -- Status
+   is then usually alone on its wrapped line, with nothing on that same
+   line for the divider to separate it from. */
+[data-row-style="v2"].tli-ticket-open .tli-bulkbar-divider {
+  display: none;
+}
+
+/* Narrow view only (a ticket is open, list column at 340px): shrink the
+   clear (x) button back down from the wide view's enlarged 26px/16px.
+   It stays in its natural spot right next to "N selected" -- an
+   earlier pass moved it to the far right after Status via `order`,
+   which was reverted: it belongs next to the selected count, not
+   pinned to the row's far corner. */
+[data-row-style="v2"].tli-ticket-open [data-bulk-action="clear"] {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+}
+[data-row-style="v2"].tli-ticket-open [data-bulk-action="clear"] svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Property buttons (Status/Assignee/Folder/Snooze/Export): black
+   text/icons instead of the real `.lite-button--secondary`'s orange
+   accent colour (both on `color`, since the icons are `stroke:
+   currentColor` svgs and pick it up automatically), a neutral border
+   to match, and more generous padding to breathe. */
+[data-row-style="v2"] .ticket-bulk-bar .lite-button {
+  background: transparent !important;
+  border-color: var(--lite-border) !important;
+  color: var(--lite-text-primary);
+  padding: 10px 16px;
+  gap: 10px;
+  font-size: 13px;
+}
+[data-row-style="v2"] .ticket-bulk-bar .lite-button:hover {
+  background: var(--lite-bg-primary) !important;
+  border-color: var(--lite-text-muted) !important;
+}
+/* Icons are sized via width/height attributes on the <svg> itself
+   (14x14), not CSS -- plain width/height here overrides those cleanly
+   since HTML sizing attributes carry no more weight than a UA style. */
+[data-row-style="v2"] .ticket-bulk-bar .lite-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Narrow view (a ticket is open, 340px list column): the wide view's
+   bigger/breathing-room sizing above reads as oversized at this width
+   -- pull it back down closer to the real app's own small size (per
+   the real "Row selected" capture), rather than the bigger wide-view
+   scale. Bar padding/gap, "Select all"/count text, and the property
+   buttons' padding/font/icon size all shrink; the gray background,
+   rounded corners, black icon colour, and divider-hiding logic stay
+   as they are -- only size changes here, not the redesign itself. */
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar {
+  padding: 4px 14px;
+  gap: 12px;
+}
+/* The "Select all" group's -12px margin-right (further up) exists to
+   claw back the wide view's 24px bar gap down to something tighter for
+   that group specifically. This bar's gap is only 12px, so that same
+   -12px cancelled it out entirely -- "Select all" and "N selected" sat
+   flush against each other with no gap at all. Half as much clawback,
+   matching the smaller gap here. */
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar .lite-checkbox,
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar__select-all,
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar__count {
+  margin-right: -6px;
+}
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar__select-all,
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar__count {
+  font-size: 12px;
+}
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar .lite-button {
+  padding: 6px 10px;
+  gap: 6px;
+  font-size: 12px;
+}
+[data-row-style="v2"].tli-ticket-open .ticket-bulk-bar .lite-button svg {
+  width: 14px;
+  height: 14px;
+}
+

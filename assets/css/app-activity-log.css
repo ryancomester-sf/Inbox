@@ -1,0 +1,73 @@
+@charset "utf-8";
+
+.ActivityLog_list__LUWff { display: flex; flex-direction: column; }
+
+.ActivityLog_state__3HH_H { padding: 12px 0px; font-size: 12px; color: var(--lite-text-secondary); text-align: center; }
+
+.ActivityLog_icon__sMXso { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: color-mix(in srgb,var(--activity-color) 8%,transparent); color: var(--activity-color); }
+
+.ActivityLog_iconSm__8na3G { min-width: 22px; width: 22px; height: 22px; margin-top: 1px; }
+
+.ActivityLog_iconLg__f0DwI { min-width: 28px; width: 28px; height: 28px; margin-top: 2px; }
+
+.ActivityLog_item__HGlIt { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0px; }
+
+.ActivityLog_itemClickable___3XwE { cursor: pointer; }
+
+.ActivityLog_body__JsaFd { flex: 1 1 0%; min-width: 0px; }
+
+.ActivityLog_description__x_RdO { font-size: 12px; color: var(--lite-text-primary); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ActivityLog_meta__8xcuH { font-size: 11px; color: var(--lite-text-secondary); margin-top: 1px; }
+
+.ActivityLog_viewAll__9D4NN { display: block; width: 100%; padding: 6px 0px; margin-top: 4px; background: none; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; font-size: 12px; font-weight: 500; color: var(--lite-accent,#3b82f6); cursor: pointer; text-align: center; }
+
+.ActivityLog_modalItem__QPo6u { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0px; border-bottom: 1px solid var(--lite-border,#e5e7eb); }
+
+.ActivityLog_modalDescription__KDeRU { font-size: 13px; color: var(--lite-text-primary); line-height: 1.4; }
+
+.ActivityLog_detail__25K1A { margin-top: 2px; font-size: 11px; color: var(--lite-text-secondary); }
+
+.ActivityLog_detailItalic__lmtt7 { font-style: italic; }
+
+.ActivityLog_modalMeta__Routh { font-size: 11px; color: var(--lite-text-secondary); margin-top: 3px; }
+
+.ActivityLog_goToMessage__f0DVz { color: var(--lite-accent,#3b82f6); font-size: 11px; white-space: nowrap; margin-top: 2px; }
+
+.ActivityLog_scroll__zyC7r { max-height: 400px; overflow-y: auto; }
+
+.ActivityLog_loading__pKSzC { padding: 16px 0px; text-align: center; font-size: 12px; color: var(--lite-text-secondary); }
+
+.ActivityLog_empty__2tUJ1 { padding: 24px 0px; text-align: center; font-size: 13px; color: var(--lite-text-secondary); }
+
+.ActivityLog_loadMore__dXevK { display: block; width: 100%; padding: 10px; background: none; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; font-size: 12px; font-weight: 500; color: var(--lite-accent,#3b82f6); cursor: pointer; }
+
+.CsatStatsSection_wrapper__EdOvL { margin-top: 24px; }
+
+.CsatStatsSection_card__jFnj5 { background: var(--lite-bg-secondary); border: 1px solid var(--lite-border); border-radius: 12px; padding: 20px; }
+
+.CsatStatsSection_header__z4QTX { margin-bottom: 16px; }
+
+.CsatStatsSection_title__jEncn { font-size: 13px; font-weight: 600; color: var(--lite-text-primary); }
+
+.CsatStatsSection_subtitle__iB7S9 { font-size: 11px; color: var(--lite-text-secondary); font-weight: 400; margin-left: 8px; }
+
+.CsatStatsSection_summaryGrid__3MlXf { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+
+.CsatStatsSection_summaryCell__JrQKB { text-align: center; padding: 10px; background: var(--lite-bg-tertiary); border-radius: 8px; }
+
+.CsatStatsSection_summaryValue__Ujqvj { font-size: 22px; font-weight: 700; color: var(--lite-text-primary); }
+
+.CsatStatsSection_summaryLabel__mqV82 { font-size: 10px; color: var(--lite-text-secondary); margin-top: 2px; }
+
+.CsatStatsSection_distributionList__BE0vu { display: flex; flex-direction: column; gap: 4px; }
+
+.CsatStatsSection_distributionRow__xKmZQ { display: flex; align-items: center; gap: 8px; }
+
+.CsatStatsSection_ratingLabel__wWuve { font-size: 12px; color: var(--lite-text-muted); width: 16px; text-align: right; }
+
+.CsatStatsSection_barTrack__6_BAs { flex: 1 1 0%; height: 8px; background: var(--lite-bg-tertiary); border-radius: 4px; }
+
+.CsatStatsSection_barFill__uTF5H { height: 100%; border-radius: 4px; min-width: 4px; }
+
+.CsatStatsSection_ratingCount___e3N4 { font-size: 11px; color: var(--lite-text-muted); width: 24px; text-align: right; }
