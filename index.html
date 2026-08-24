@@ -31615,6 +31615,27 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   border-left-color: transparent !important;
 }
 
+/* Marked "Resolved" from the Status dropdown (see app.js's onSelect on
+   that config) -- a pale blue tint (reusing the same rgba-over-real-
+   colour pattern as the checked/Email-channel tints elsewhere, not a
+   made-up colour) and, same reasoning as .tli--active above, no left
+   accent stripe: a resolved ticket isn't "unread" or "needs attention"
+   anymore. Placed after .tli--checked so a still-checked-but-now-
+   resolved row shows the resolved colour, not the checked one. */
+[data-row-style="v2"] .tli--status-resolved {
+  background: rgba(99, 102, 241, 0.07) !important;
+  border-left-color: transparent !important;
+}
+
+/* Snoozed (from the Snooze dropdown, see app.js's onSelect on that
+   config): the agent avatar stack collapses down to just the one avatar
+   -- who else is on the conversation matters less once it's snoozed,
+   and hiding the 2nd/"+N" here is simpler than re-running the stack's
+   own JS to actually rebuild it with fewer avatars. */
+[data-row-style="v2"] .tli--snoozed .tli2-agents > :not(:first-child) {
+  display: none !important;
+}
+
 [data-row-style="v2"] .tli2-body {
   flex: 1 1 auto;
   min-width: 0;
@@ -31714,6 +31735,82 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
 [data-row-style="v2"] .tli2-subject {
   font-weight: 700;
   color: var(--lite-text-primary);
+}
+
+/* Resolved ticket: strike through the card's text content (name,
+   mailbox tag, subject, preview). Set once on the shared text wrapper
+   rather than each span individually -- text-decoration lines still
+   draw through all descendant text, so one rule covers everything. */
+[data-row-style="v2"] .tli--resolved .tli2-body {
+  text-decoration: line-through;
+  text-decoration-color: var(--lite-text-muted);
+}
+
+/* Snoozed state: no badge/tag -- the card's own text goes muted instead
+   (name/subject drop from bold-black to a neutral grey), plus a small
+   bell-z icon at the bottom-right, right after the agent avatar stack
+   (see .tli2-snooze-icon below). Colours are hardcoded hex, not the
+   app's own --lite-* tokens: pulled from a Figma reference (an input
+   field component, not anything snooze-related -- only its neutral
+   gray palette was wanted, not the component itself) --
+   figma.com/design/ZaCcIn0prAT0XAF31Yby6g, node 169-126. That palette
+   is a cooler, plainer gray (blue-tinted) than this app's own warm
+   tan-tinted muted tokens, which is the point: it reads more distinctly
+   as "greyed out" than the warm tones did. !important because
+   .tli2-name/.tli2-subject already set their own bold + primary-colour
+   rules. */
+[data-row-style="v2"] .tli--snoozed {
+  /* Figma gray/100. !important: real `.tli--unread { background: #fff }`
+     would otherwise win on source order for unread-and-snoozed rows
+     despite prototype.css loading after it, since that real rule is
+     unscoped and technically no lower specificity once combined with
+     this selector's own attribute prefix -- not worth relying on exact
+     cascade math here. */
+  background: #F3F4F6 !important;
+}
+[data-row-style="v2"] .tli--snoozed .tli2-name,
+[data-row-style="v2"] .tli--snoozed .tli2-subject {
+  color: #AAB2BB !important; /* Figma text/static/placeholder */
+  font-weight: 400 !important;
+}
+[data-row-style="v2"] .tli--snoozed .tli2-mailbox,
+[data-row-style="v2"] .tli--snoozed .tli2-line2-text {
+  color: #AAB2BB;
+}
+/* The leading channel icon (Email/Instagram/WhatsApp/...) goes grey too,
+   not just the text -- :not(.tli--checked) so checking a snoozed row
+   still shows the accent-filled checkbox instead of this overriding it
+   back to grey (both rules use !important; this one would otherwise win
+   on source order alone, regardless of which state is more relevant).
+   Icon background is the Figma border colour (gray/300, one shade
+   darker than the row's own gray/100) rather than the same tone the row
+   uses, so the icon circle still reads as a distinct shape against it
+   instead of blending in. */
+[data-row-style="v2"] .tli--snoozed:not(.tli--checked) .tli2-icon {
+  background: #D1D5DB !important;
+  color: #AAB2BB !important;
+}
+
+/* Bell-z icon: plain, no pill/background -- just an icon sitting at the
+   end of the second line, after the agent avatars. Darkened + a stroke
+   traced over the fill (there's no separate "bold" weight asset for
+   this particular Phosphor icon -- regular is the only variant it
+   ships) so it doesn't wash out at 16px like the plain fill did. */
+[data-row-style="v2"] .tli2-snooze-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-left: 4px;
+  color: var(--lite-text-secondary);
+}
+[data-row-style="v2"] .tli2-snooze-icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+[data-row-style="v2"] .tli2-snooze-icon svg path {
+  stroke: currentColor;
+  stroke-width: 8px;
+  paint-order: stroke fill;
 }
 
 /* ---------------------------------------------------------------
@@ -31897,10 +31994,10 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
  * ------------------------------------------------------------- */
 [data-row-style="v2"] .ticket-bulk-bar {
   background: #E9E9E6;
-  /* Top/bottom matches the real app's own `.ticket-bulk-bar` padding
-     (6px 8px in app-main.css) -- horizontal stays wider for breathing
-     room, only the vertical value is meant to match the real size. */
-  padding: 6px 18px;
+  /* Deliberately tighter than the real app's own 6px: most of this bar's
+     height actually comes from the property buttons' own padding below,
+     not this value, so cutting both is what actually shrinks it. */
+  padding: 2px 18px;
   gap: 24px;
   border-bottom: 1px solid var(--lite-border);
   border-radius: 12px;
@@ -31985,7 +32082,9 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   background: transparent !important;
   border-color: var(--lite-border) !important;
   color: var(--lite-text-primary);
-  padding: 10px 16px;
+  /* Vertical padding cut hard -- this, not the bar's own padding, is
+     what was actually making the whole bar read as tall. */
+  padding: 4px 16px;
   gap: 10px;
   font-size: 13px;
 }
@@ -32194,6 +32293,7 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   var DEMO_AGENT_OVERRIDES = {
     2: ["Anna Koskinen", "Jere Salo"], // 2 agents, no overflow badge
     5: ["Anna Koskinen", "Jere Salo", "Liisa Virtanen", "Marko Nieminen"], // -> +2
+    6: ["Anna Koskinen", "Jere Salo", "Liisa Virtanen", "Marko Nieminen"], // Samu Suominen row -> +2
   };
 
   function initials(name) {
@@ -32342,6 +32442,37 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   }
 
   document.querySelectorAll('[data-row-style="v2"] .tli').forEach(redesignRow);
+
+  // --- One resolved ticket, near the end of the list ----------------------
+  // Demo content for what a resolved ticket looks like in this redesign:
+  // its text struck through. There's no real per-row status data in the
+  // captured markup to drive this off of, so it's just the last row in
+  // the list -- swap which row by adjusting the selector below.
+  document.querySelectorAll('[data-row-style="v2"]').forEach(function (scope) {
+    var rowsForResolved = scope.querySelectorAll(".tli");
+    var lastRow = rowsForResolved[rowsForResolved.length - 1];
+    if (lastRow) lastRow.classList.add("tli--resolved");
+  });
+
+  // --- Snoozed state, on a couple of demo rows ----------------------------
+  // No badge/tag -- the row's own text just goes muted (name/subject drop
+  // to the same muted grey + regular weight the app already uses for read
+  // messages elsewhere, not full strikethrough like .tli--resolved), and a
+  // small bell-z (Phosphor, github.com/phosphor-icons/core, MIT) sits at
+  // the bottom-right of the card, right after the agent avatar stack. No
+  // real per-row snooze data to drive this off of, so it's targeted by
+  // name -- add/remove rows by adjusting this list.
+  var SNOOZE_ROWS = [/Kippis Heinola DGP World/, /Samu Suominen/];
+  var SNOOZE_BELL_ICON =
+    '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M152,144a8,8,0,0,1-8,8H112a8,8,0,0,1-6.65-12.44L129.05,104H112a8,8,0,0,1,0-16h32a8,8,0,0,1,6.65,12.44L127,136h17A8,8,0,0,1,152,144Zm69.84,48A15.8,15.8,0,0,1,208,200H167.19a40,40,0,0,1-78.38,0H48a16,16,0,0,1-13.8-24.06C39.75,166.38,48,139.34,48,104a80,80,0,1,1,160,0c0,35.33,8.26,62.38,13.81,71.94A15.89,15.89,0,0,1,221.84,192Zm-71.22,8H105.38a24,24,0,0,0,45.24,0ZM208,184c-7.73-13.27-16-43.95-16-80a64,64,0,1,0-128,0c0,36.06-8.28,66.74-16,80Z"/></svg>';
+  document.querySelectorAll('[data-row-style="v2"] .tli').forEach(function (row) {
+    var label = row.getAttribute("aria-label") || "";
+    if (!SNOOZE_ROWS.some(function (re) { return re.test(label); })) return;
+    row.classList.add("tli--snoozed");
+    var line2 = row.querySelector(".tli2-line2");
+    if (!line2) return;
+    line2.appendChild(makeEl("span", "tli2-snooze-icon", SNOOZE_BELL_ICON));
+  });
 
   /*
    * --- Multi-select + bulk-action bar --------------------------------
@@ -32626,7 +32757,10 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
       } else {
         row.textContent = item;
       }
-      row.addEventListener("click", closeOpenDropdown);
+      row.addEventListener("click", function () {
+        if (options.onSelect) options.onSelect(item);
+        closeOpenDropdown();
+      });
       list.appendChild(row);
     });
     menu.appendChild(list);
@@ -32735,6 +32869,17 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
         textOf: function (s) {
           return s.label;
         },
+        // Applies the picked status to every currently checked row --
+        // visually, for now, just "Resolved" gets its own look (pale
+        // blue background, no left accent stripe, same transparent-
+        // border trick used for an opened ticket). The other statuses
+        // don't have a distinct row appearance requested yet.
+        onSelect: function (status) {
+          scopeRoot.querySelectorAll(".tli--checked").forEach(function (row) {
+            row.classList.remove("tli--status-resolved");
+            if (status.label === "Resolved") row.classList.add("tli--status-resolved");
+          });
+        },
       },
       {
         text: "Assignee",
@@ -32744,7 +32889,20 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
         searchable: true,
       },
       { text: "Folder", title: "ADD TO FOLDER", items: folderNamesFrom(scopeRoot) },
-      { text: "Snooze", title: "SNOOZE IN", items: SNOOZE_ITEMS },
+      {
+        text: "Snooze",
+        title: "SNOOZE IN",
+        items: SNOOZE_ITEMS,
+        // Any snooze duration -> snoozed. The row's agent avatar stack
+        // collapses to just one avatar while snoozed (see .tli--snoozed
+        // in prototype.css) -- who's actively on a snoozed conversation
+        // isn't as relevant as it is for an active one.
+        onSelect: function () {
+          scopeRoot.querySelectorAll(".tli--checked").forEach(function (row) {
+            row.classList.add("tli--snoozed");
+          });
+        },
+      },
     ];
 
     bar.querySelectorAll(".lite-button").forEach(function (btn) {
@@ -32759,6 +32917,7 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
           renderItem: config.renderItem,
           searchable: config.searchable,
           textOf: config.textOf,
+          onSelect: config.onSelect,
         });
       });
     });

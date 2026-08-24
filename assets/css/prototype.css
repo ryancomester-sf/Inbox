@@ -147,6 +147,27 @@
   border-left-color: transparent !important;
 }
 
+/* Marked "Resolved" from the Status dropdown (see app.js's onSelect on
+   that config) -- a pale blue tint (reusing the same rgba-over-real-
+   colour pattern as the checked/Email-channel tints elsewhere, not a
+   made-up colour) and, same reasoning as .tli--active above, no left
+   accent stripe: a resolved ticket isn't "unread" or "needs attention"
+   anymore. Placed after .tli--checked so a still-checked-but-now-
+   resolved row shows the resolved colour, not the checked one. */
+[data-row-style="v2"] .tli--status-resolved {
+  background: rgba(99, 102, 241, 0.07) !important;
+  border-left-color: transparent !important;
+}
+
+/* Snoozed (from the Snooze dropdown, see app.js's onSelect on that
+   config): the agent avatar stack collapses down to just the one avatar
+   -- who else is on the conversation matters less once it's snoozed,
+   and hiding the 2nd/"+N" here is simpler than re-running the stack's
+   own JS to actually rebuild it with fewer avatars. */
+[data-row-style="v2"] .tli--snoozed .tli2-agents > :not(:first-child) {
+  display: none !important;
+}
+
 [data-row-style="v2"] .tli2-body {
   flex: 1 1 auto;
   min-width: 0;
@@ -246,6 +267,72 @@
 [data-row-style="v2"] .tli2-subject {
   font-weight: 700;
   color: var(--lite-text-primary);
+}
+
+/* Resolved ticket: strike through the card's text content (name,
+   mailbox tag, subject, preview). Set once on the shared text wrapper
+   rather than each span individually -- text-decoration lines still
+   draw through all descendant text, so one rule covers everything. */
+[data-row-style="v2"] .tli--resolved .tli2-body {
+  text-decoration: line-through;
+  text-decoration-color: var(--lite-text-muted);
+}
+
+/* Snoozed state: no badge/tag, no special grey background -- a snoozed
+   ticket's row looks exactly like any other already-read ticket, plus a
+   small bell-z icon at the bottom-right, right after the agent avatar
+   stack (see .tli2-snooze-icon below). Name/subject drop from
+   bold-primary to the real app's own "read" text tokens --
+   `.tli__name--read`/`.tli__preview--read` in app-main.css -- rather
+   than a custom hardcoded grey, so this matches what a read ticket
+   already looks like elsewhere instead of inventing a separate
+   "snoozed grey". !important because .tli2-name/.tli2-subject already
+   set their own bold + primary-colour rules. */
+[data-row-style="v2"] .tli--snoozed {
+  /* The two demo rows this is applied to (see SNOOZE_ROWS in app.js)
+     happen to still be real-unread tickets underneath, which would
+     otherwise win via the real `.tli--unread { background: #fff;
+     border-left-color: ... }` rule -- forced back to the plain
+     read-ticket look (transparent background, no accent stripe)
+     regardless, same reasoning as `.tli--resolved`/`.tli--active`
+     stripping that stripe further up. */
+  background: rgba(0, 0, 0, 0) !important;
+  border-left-color: transparent !important;
+}
+[data-row-style="v2"] .tli--snoozed .tli2-name,
+[data-row-style="v2"] .tli--snoozed .tli2-subject {
+  color: var(--lite-text-secondary) !important; /* real app's .tli__name--read */
+  font-weight: 400 !important;
+}
+[data-row-style="v2"] .tli--snoozed .tli2-mailbox,
+[data-row-style="v2"] .tli--snoozed .tli2-line2-text {
+  color: var(--lite-text-muted); /* real app's .tli__preview--read */
+}
+/* The leading channel icon (Email/Instagram/WhatsApp/...) keeps its real
+   per-channel colour when snoozed -- only the text/tag desaturate above.
+   (An earlier pass also greyed this icon out; that's been reverted per
+   explicit request.) */
+
+/* Bell-z icon: plain, no pill/background -- just an icon sitting at the
+   end of the second line, after the agent avatars. Darkened + a stroke
+   traced over the fill (there's no separate "bold" weight asset for
+   this particular Phosphor icon -- regular is the only variant it
+   ships) so it doesn't wash out at 16px like the plain fill did. */
+[data-row-style="v2"] .tli2-snooze-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-left: 4px;
+  color: var(--lite-text-secondary);
+}
+[data-row-style="v2"] .tli2-snooze-icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+[data-row-style="v2"] .tli2-snooze-icon svg path {
+  stroke: currentColor;
+  stroke-width: 8px;
+  paint-order: stroke fill;
 }
 
 /* ---------------------------------------------------------------
@@ -429,10 +516,9 @@
  * ------------------------------------------------------------- */
 [data-row-style="v2"] .ticket-bulk-bar {
   background: #E9E9E6;
-  /* Top/bottom matches the real app's own `.ticket-bulk-bar` padding
-     (6px 8px in app-main.css) -- horizontal stays wider for breathing
-     room, only the vertical value is meant to match the real size. */
-  padding: 6px 18px;
+  /* Top/bottom explicitly set to 8px per request; left/right stay at the
+     wider 18px used elsewhere in this bar. */
+  padding: 8px 18px;
   gap: 24px;
   border-bottom: 1px solid var(--lite-border);
   border-radius: 12px;
@@ -517,7 +603,9 @@
   background: transparent !important;
   border-color: var(--lite-border) !important;
   color: var(--lite-text-primary);
-  padding: 10px 16px;
+  /* Vertical padding cut hard -- this, not the bar's own padding, is
+     what was actually making the whole bar read as tall. */
+  padding: 4px 16px;
   gap: 10px;
   font-size: 13px;
 }

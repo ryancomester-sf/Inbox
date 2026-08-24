@@ -143,6 +143,7 @@
   var DEMO_AGENT_OVERRIDES = {
     2: ["Anna Koskinen", "Jere Salo"], // 2 agents, no overflow badge
     5: ["Anna Koskinen", "Jere Salo", "Liisa Virtanen", "Marko Nieminen"], // -> +2
+    6: ["Anna Koskinen", "Jere Salo", "Liisa Virtanen", "Marko Nieminen"], // Samu Suominen row -> +2
   };
 
   function initials(name) {
@@ -291,6 +292,37 @@
   }
 
   document.querySelectorAll('[data-row-style="v2"] .tli').forEach(redesignRow);
+
+  // --- One resolved ticket, near the end of the list ----------------------
+  // Demo content for what a resolved ticket looks like in this redesign:
+  // its text struck through. There's no real per-row status data in the
+  // captured markup to drive this off of, so it's just the last row in
+  // the list -- swap which row by adjusting the selector below.
+  document.querySelectorAll('[data-row-style="v2"]').forEach(function (scope) {
+    var rowsForResolved = scope.querySelectorAll(".tli");
+    var lastRow = rowsForResolved[rowsForResolved.length - 1];
+    if (lastRow) lastRow.classList.add("tli--resolved");
+  });
+
+  // --- Snoozed state, on a couple of demo rows ----------------------------
+  // No badge/tag -- the row's own text just goes muted (name/subject drop
+  // to the same muted grey + regular weight the app already uses for read
+  // messages elsewhere, not full strikethrough like .tli--resolved), and a
+  // small bell-z (Phosphor, github.com/phosphor-icons/core, MIT) sits at
+  // the bottom-right of the card, right after the agent avatar stack. No
+  // real per-row snooze data to drive this off of, so it's targeted by
+  // name -- add/remove rows by adjusting this list.
+  var SNOOZE_ROWS = [/Kippis Heinola DGP World/, /Samu Suominen/];
+  var SNOOZE_BELL_ICON =
+    '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M152,144a8,8,0,0,1-8,8H112a8,8,0,0,1-6.65-12.44L129.05,104H112a8,8,0,0,1,0-16h32a8,8,0,0,1,6.65,12.44L127,136h17A8,8,0,0,1,152,144Zm69.84,48A15.8,15.8,0,0,1,208,200H167.19a40,40,0,0,1-78.38,0H48a16,16,0,0,1-13.8-24.06C39.75,166.38,48,139.34,48,104a80,80,0,1,1,160,0c0,35.33,8.26,62.38,13.81,71.94A15.89,15.89,0,0,1,221.84,192Zm-71.22,8H105.38a24,24,0,0,0,45.24,0ZM208,184c-7.73-13.27-16-43.95-16-80a64,64,0,1,0-128,0c0,36.06-8.28,66.74-16,80Z"/></svg>';
+  document.querySelectorAll('[data-row-style="v2"] .tli').forEach(function (row) {
+    var label = row.getAttribute("aria-label") || "";
+    if (!SNOOZE_ROWS.some(function (re) { return re.test(label); })) return;
+    row.classList.add("tli--snoozed");
+    var line2 = row.querySelector(".tli2-line2");
+    if (!line2) return;
+    line2.appendChild(makeEl("span", "tli2-snooze-icon", SNOOZE_BELL_ICON));
+  });
 
   /*
    * --- Multi-select + bulk-action bar --------------------------------
@@ -575,7 +607,10 @@
       } else {
         row.textContent = item;
       }
-      row.addEventListener("click", closeOpenDropdown);
+      row.addEventListener("click", function () {
+        if (options.onSelect) options.onSelect(item);
+        closeOpenDropdown();
+      });
       list.appendChild(row);
     });
     menu.appendChild(list);
@@ -684,6 +719,17 @@
         textOf: function (s) {
           return s.label;
         },
+        // Applies the picked status to every currently checked row --
+        // visually, for now, just "Resolved" gets its own look (pale
+        // blue background, no left accent stripe, same transparent-
+        // border trick used for an opened ticket). The other statuses
+        // don't have a distinct row appearance requested yet.
+        onSelect: function (status) {
+          scopeRoot.querySelectorAll(".tli--checked").forEach(function (row) {
+            row.classList.remove("tli--status-resolved");
+            if (status.label === "Resolved") row.classList.add("tli--status-resolved");
+          });
+        },
       },
       {
         text: "Assignee",
@@ -693,7 +739,20 @@
         searchable: true,
       },
       { text: "Folder", title: "ADD TO FOLDER", items: folderNamesFrom(scopeRoot) },
-      { text: "Snooze", title: "SNOOZE IN", items: SNOOZE_ITEMS },
+      {
+        text: "Snooze",
+        title: "SNOOZE IN",
+        items: SNOOZE_ITEMS,
+        // Any snooze duration -> snoozed. The row's agent avatar stack
+        // collapses to just one avatar while snoozed (see .tli--snoozed
+        // in prototype.css) -- who's actively on a snoozed conversation
+        // isn't as relevant as it is for an active one.
+        onSelect: function () {
+          scopeRoot.querySelectorAll(".tli--checked").forEach(function (row) {
+            row.classList.add("tli--snoozed");
+          });
+        },
+      },
     ];
 
     bar.querySelectorAll(".lite-button").forEach(function (btn) {
@@ -708,6 +767,7 @@
           renderItem: config.renderItem,
           searchable: config.searchable,
           textOf: config.textOf,
+          onSelect: config.onSelect,
         });
       });
     });
