@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
 Combines everything already produced by build.py / build_state.py into
-ONE self-contained inbox-prototype.html: all four captured states as
-switchable panels, all CSS/JS/images inlined. No server, no asset
-folder -- just open the file.
+ONE self-contained index.html: the List state (see ENTRY_SLUG below),
+all CSS/JS/images inlined. No server, no asset folder -- just open the
+file, and it's also what a static host serves by default at the
+directory root, which is the point of it being named index.html and
+not inbox-prototype.html like it used to be.
 
 Run this AFTER build.py and build_state.py have (re)generated
-index.html / states/*/index.html + their assets/.
+baseline-source.html / states/*/index.html + their assets/.
 """
 import base64
 import mimetypes
@@ -18,8 +20,16 @@ from bs4 import BeautifulSoup
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 STATES = [
-    # slug, source index.html (relative to ROOT), css group ("dash" | "dev"), label
-    ("baseline", "index.html", "dash", "Baseline"),
+    # slug, source html (relative to ROOT), css group ("dash" | "dev"), label
+    #
+    # "baseline"'s source file used to be named index.html, back when that
+    # name was free -- it's the raw dash.serviceform.com capture build.py
+    # produces, not this script's own output. Renamed to baseline-source.html
+    # so this script can write its real output to index.html instead of
+    # inbox-prototype.html (a static host serves index.html by default at
+    # the directory root; the old name meant a host showed this baseline
+    # capture instead of the List redesign that's actually the point).
+    ("baseline", "baseline-source.html", "dash", "Baseline"),
     ("list", "states/list/index.html", "dev", "1. List"),
     ("selected", "states/selected/index.html", "dev", "2. Row selected"),
     ("open-ticket", "states/open-ticket/index.html", "dev", "3. Ticket open"),
@@ -233,7 +243,7 @@ def main():
 </html>
 """
 
-    out_path = os.path.join(ROOT, "inbox-prototype.html")
+    out_path = os.path.join(ROOT, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(out)
     print("Wrote", out_path, len(out), "bytes")

@@ -3,7 +3,14 @@
 One-off build script: extracts the Serviceform Lite inbox snapshot out of
 `../Inbox - Serviceform.mhtml` into a plain, editable HTML/CSS/JS prototype
 in this folder. Not meant to be wired into any real build pipeline -- just
-run once to (re)generate index.html + assets/ from the source .mhtml.
+run once to (re)generate baseline-source.html + assets/ from the source
+.mhtml.
+
+Output is named baseline-source.html, NOT index.html: build_single.py
+writes the real index.html (the List redesign, what a static host serves
+by default), and reads this baseline capture as one of its inputs. Naming
+this file index.html too would let re-running this script clobber that
+real output with the raw baseline capture instead.
 """
 import email
 import os
@@ -161,9 +168,9 @@ html = html.replace(
     1,
 )
 
-with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
+with open(os.path.join(ROOT, "baseline-source.html"), "w", encoding="utf-8") as f:
     f.write(html)
 
-print("Wrote index.html:", len(html), "bytes")
+print("Wrote baseline-source.html:", len(html), "bytes")
 print("CSS files:", len(css_files))
 print("Image files:", len(img_files))
