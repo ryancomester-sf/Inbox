@@ -31746,61 +31746,48 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   text-decoration-color: var(--lite-text-muted);
 }
 
-/* Snoozed state: no badge/tag -- the card's own text goes muted instead
-   (name/subject drop from bold-black to a neutral grey), plus a small
-   bell-z icon at the bottom-right, right after the agent avatar stack
-   (see .tli2-snooze-icon below). Colours are hardcoded hex, not the
-   app's own --lite-* tokens: pulled from a Figma reference (an input
-   field component, not anything snooze-related -- only its neutral
-   gray palette was wanted, not the component itself) --
-   figma.com/design/ZaCcIn0prAT0XAF31Yby6g, node 169-126. That palette
-   is a cooler, plainer gray (blue-tinted) than this app's own warm
-   tan-tinted muted tokens, which is the point: it reads more distinctly
-   as "greyed out" than the warm tones did. !important because
-   .tli2-name/.tli2-subject already set their own bold + primary-colour
-   rules. */
+/* Snoozed state: no badge/tag, no special grey anywhere -- a snoozed
+   ticket's row looks exactly like any other ticket, text included (name/
+   subject/mailbox/preview all keep the same bold-primary/secondary/muted
+   colours every other row already uses -- no separate muted/"read" text
+   treatment), plus a small bell-z icon at the bottom-right, right after
+   the agent avatar stack (see .tli2-snooze-icon below). */
 [data-row-style="v2"] .tli--snoozed {
-  /* Figma gray/100. !important: real `.tli--unread { background: #fff }`
-     would otherwise win on source order for unread-and-snoozed rows
-     despite prototype.css loading after it, since that real rule is
-     unscoped and technically no lower specificity once combined with
-     this selector's own attribute prefix -- not worth relying on exact
-     cascade math here. */
-  background: #F3F4F6 !important;
+  /* The two demo rows this is applied to (see SNOOZE_ROWS in app.js)
+     happen to still be real-unread tickets underneath, which would
+     otherwise win via the real `.tli--unread { background: #fff;
+     border-left-color: ... }` rule -- forced back to the plain
+     read-ticket look (transparent background, no accent stripe)
+     regardless, same reasoning as `.tli--resolved`/`.tli--active`
+     stripping that stripe further up. */
+  background: rgba(0, 0, 0, 0) !important;
+  border-left-color: transparent !important;
 }
-[data-row-style="v2"] .tli--snoozed .tli2-name,
-[data-row-style="v2"] .tli--snoozed .tli2-subject {
-  color: #AAB2BB !important; /* Figma text/static/placeholder */
-  font-weight: 400 !important;
-}
-[data-row-style="v2"] .tli--snoozed .tli2-mailbox,
-[data-row-style="v2"] .tli--snoozed .tli2-line2-text {
-  color: #AAB2BB;
-}
-/* The leading channel icon (Email/Instagram/WhatsApp/...) goes grey too,
-   not just the text -- :not(.tli--checked) so checking a snoozed row
-   still shows the accent-filled checkbox instead of this overriding it
-   back to grey (both rules use !important; this one would otherwise win
-   on source order alone, regardless of which state is more relevant).
-   Icon background is the Figma border colour (gray/300, one shade
-   darker than the row's own gray/100) rather than the same tone the row
-   uses, so the icon circle still reads as a distinct shape against it
-   instead of blending in. */
-[data-row-style="v2"] .tli--snoozed:not(.tli--checked) .tli2-icon {
-  background: #D1D5DB !important;
-  color: #AAB2BB !important;
-}
+/* The leading channel icon (Email/Instagram/WhatsApp/...) keeps its real
+   per-channel colour when snoozed, same as the text above -- nothing
+   about a snoozed row is desaturated/greyed anymore. (Two earlier passes
+   did grey the icon and, separately, the text out; both reverted per
+   explicit request.) */
 
-/* Bell-z icon: plain, no pill/background -- just an icon sitting at the
-   end of the second line, after the agent avatars. Darkened + a stroke
-   traced over the fill (there's no separate "bold" weight asset for
-   this particular Phosphor icon -- regular is the only variant it
-   ships) so it doesn't wash out at 16px like the plain fill did. */
+/* Bell-z icon: sits in a small rounded-corner (not fully round) yellow
+   tag/badge at the end of the second line, after the agent avatars.
+   Colours are the app's own real `.tli__badge--snoozed` token in
+   app-main.css -- a pale yellow tint + matching soft border + dark-gold
+   text/icon, the exact palette the app already uses to badge a snoozed
+   ticket elsewhere -- not an invented yellow. The padding on the
+   wrapper is what makes the tag -- the icon itself (16px) doesn't
+   change size. */
 [data-row-style="v2"] .tli2-snooze-icon {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   margin-left: 4px;
-  color: var(--lite-text-secondary);
+  padding: 4px;
+  border-radius: 6px;
+  background: rgba(240, 181, 40, 0.1);
+  border: 1px solid rgba(240, 181, 40, 0.25);
+  color: rgb(138, 106, 26);
 }
 [data-row-style="v2"] .tli2-snooze-icon svg {
   width: 16px;
@@ -31994,10 +31981,9 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
  * ------------------------------------------------------------- */
 [data-row-style="v2"] .ticket-bulk-bar {
   background: #E9E9E6;
-  /* Deliberately tighter than the real app's own 6px: most of this bar's
-     height actually comes from the property buttons' own padding below,
-     not this value, so cutting both is what actually shrinks it. */
-  padding: 2px 18px;
+  /* Top/bottom explicitly set to 8px per request; left/right stay at the
+     wider 18px used elsewhere in this bar. */
+  padding: 8px 18px;
   gap: 24px;
   border-bottom: 1px solid var(--lite-border);
   border-radius: 12px;
@@ -32136,8 +32122,6 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   width: 14px;
   height: 14px;
 }
-
-
 </style>
 </head>
 <body class="sf-app not-windows">

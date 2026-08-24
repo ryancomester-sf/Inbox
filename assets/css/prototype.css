@@ -278,16 +278,12 @@
   text-decoration-color: var(--lite-text-muted);
 }
 
-/* Snoozed state: no badge/tag, no special grey background -- a snoozed
-   ticket's row looks exactly like any other already-read ticket, plus a
-   small bell-z icon at the bottom-right, right after the agent avatar
-   stack (see .tli2-snooze-icon below). Name/subject drop from
-   bold-primary to the real app's own "read" text tokens --
-   `.tli__name--read`/`.tli__preview--read` in app-main.css -- rather
-   than a custom hardcoded grey, so this matches what a read ticket
-   already looks like elsewhere instead of inventing a separate
-   "snoozed grey". !important because .tli2-name/.tli2-subject already
-   set their own bold + primary-colour rules. */
+/* Snoozed state: no badge/tag, no special grey anywhere -- a snoozed
+   ticket's row looks exactly like any other ticket, text included (name/
+   subject/mailbox/preview all keep the same bold-primary/secondary/muted
+   colours every other row already uses -- no separate muted/"read" text
+   treatment), plus a small bell-z icon at the bottom-right, right after
+   the agent avatar stack (see .tli2-snooze-icon below). */
 [data-row-style="v2"] .tli--snoozed {
   /* The two demo rows this is applied to (see SNOOZE_ROWS in app.js)
      happen to still be real-unread tickets underneath, which would
@@ -299,30 +295,31 @@
   background: rgba(0, 0, 0, 0) !important;
   border-left-color: transparent !important;
 }
-[data-row-style="v2"] .tli--snoozed .tli2-name,
-[data-row-style="v2"] .tli--snoozed .tli2-subject {
-  color: var(--lite-text-secondary) !important; /* real app's .tli__name--read */
-  font-weight: 400 !important;
-}
-[data-row-style="v2"] .tli--snoozed .tli2-mailbox,
-[data-row-style="v2"] .tli--snoozed .tli2-line2-text {
-  color: var(--lite-text-muted); /* real app's .tli__preview--read */
-}
 /* The leading channel icon (Email/Instagram/WhatsApp/...) keeps its real
-   per-channel colour when snoozed -- only the text/tag desaturate above.
-   (An earlier pass also greyed this icon out; that's been reverted per
+   per-channel colour when snoozed, same as the text above -- nothing
+   about a snoozed row is desaturated/greyed anymore. (Two earlier passes
+   did grey the icon and, separately, the text out; both reverted per
    explicit request.) */
 
-/* Bell-z icon: plain, no pill/background -- just an icon sitting at the
-   end of the second line, after the agent avatars. Darkened + a stroke
-   traced over the fill (there's no separate "bold" weight asset for
-   this particular Phosphor icon -- regular is the only variant it
-   ships) so it doesn't wash out at 16px like the plain fill did. */
+/* Bell-z icon: sits in a small rounded-corner (not fully round) yellow
+   tag/badge at the end of the second line, after the agent avatars.
+   Colours are the app's own real `.tli__badge--snoozed` token in
+   app-main.css -- a pale yellow tint + matching soft border + dark-gold
+   text/icon, the exact palette the app already uses to badge a snoozed
+   ticket elsewhere -- not an invented yellow. The padding on the
+   wrapper is what makes the tag -- the icon itself (16px) doesn't
+   change size. */
 [data-row-style="v2"] .tli2-snooze-icon {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   margin-left: 4px;
-  color: var(--lite-text-secondary);
+  padding: 4px;
+  border-radius: 6px;
+  background: rgba(240, 181, 40, 0.1);
+  border: 1px solid rgba(240, 181, 40, 0.25);
+  color: rgb(138, 106, 26);
 }
 [data-row-style="v2"] .tli2-snooze-icon svg {
   width: 16px;
