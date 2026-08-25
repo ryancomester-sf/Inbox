@@ -324,6 +324,26 @@
     line2.appendChild(makeEl("span", "tli2-snooze-icon", SNOOZE_BELL_ICON));
   });
 
+  // --- Unsnoozed state, on the top card ------------------------------------
+  // A plain bell (Phosphor, github.com/phosphor-icons/core, MIT -- the
+  // un-modified "Bell" glyph, not the bell-z used for the snoozed tag
+  // above) paired with a "3 mins ago" label inside the same tag/badge --
+  // icon on the left, text on the right. Targeted at whichever row is
+  // first in the list (no real per-row snooze-history data to drive this
+  // off of).
+  var PLAIN_BELL_ICON =
+    '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M221.84,192A15.8,15.8,0,0,1,208,200H167.19a40,40,0,0,1-78.38,0H48a16,16,0,0,1-13.8-24.06C39.75,166.38,48,139.34,48,104a80,80,0,1,1,160,0c0,35.33,8.26,62.38,13.81,71.94ZM150.62,200H105.38a24,24,0,0,0,45.24,0ZM208,184c-7.73-13.27-16-43.95-16-80a64,64,0,1,0-128,0c0,36.06-8.28,66.74-16,80Z"/></svg>';
+  document.querySelectorAll('[data-row-style="v2"]').forEach(function (scope) {
+    var topRow = scope.querySelector(".tli");
+    if (!topRow) return;
+    var line2 = topRow.querySelector(".tli2-line2");
+    if (!line2) return;
+    var tag = makeEl("span", "tli2-snooze-icon tli2-snooze-icon--unsnoozed", "");
+    tag.appendChild(makeEl("span", "tli2-snooze-icon-glyph", PLAIN_BELL_ICON));
+    tag.appendChild(makeEl("span", "tli2-snooze-icon-text", "3 mins ago"));
+    line2.appendChild(tag);
+  });
+
   /*
    * --- Multi-select + bulk-action bar --------------------------------
    * Selection only happens by clicking the checkbox (the .tli2-icon,

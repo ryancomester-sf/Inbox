@@ -31662,15 +31662,20 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   flex: 0 1 auto;
 }
 [data-row-style="v2"] .tli2-mailbox {
-  /* Matches the real app's own `.tli__mailbox` exactly, rather than the
-     earlier eyeballed 11px. */
+  /* Styled as a small pill/tag per explicit request, rather than the
+     earlier plain inline text. */
   font-size: 8.5px;
-  color: var(--lite-text-muted);
+  color: var(--lite-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 0 1 auto;
   min-width: 0;
+  background: var(--lite-bg-tertiary);
+  border: 1px solid var(--lite-border);
+  border-radius: 5px;
+  padding: 2px 6px;
+  line-height: 1.3;
 }
 [data-row-style="v2"] .tli2-time {
   margin-left: auto;
@@ -31744,9 +31749,9 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   color: var(--lite-bg-primary);
 }
 [data-row-style="v2"] .tli2-subject {
-  /* Reduced from 700 -> 600 -> medium (500) per explicit request, same
-     weight as .tli2-name now. */
-  font-weight: 500;
+  /* Reduced from 700 -> 600 -> medium (500) -> regular (400) per explicit
+     request. */
+  font-weight: 400;
   color: var(--lite-text-primary);
 }
 
@@ -31788,29 +31793,62 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
    app-main.css -- a pale yellow tint + matching soft border + dark-gold
    text/icon, the exact palette the app already uses to badge a snoozed
    ticket elsewhere -- not an invented yellow. The padding on the
-   wrapper is what makes the tag -- the icon itself (16px) doesn't
-   change size. */
+   wrapper is what makes the tag -- the icon itself (14px) doesn't
+   change size. Sized down a notch (was 16px icon / 4px padding) since
+   the card's second line was getting tight. */
 [data-row-style="v2"] .tli2-snooze-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-left: 4px;
-  padding: 4px;
+  padding: 3px;
   border-radius: 6px;
   background: rgba(240, 181, 40, 0.1);
   border: 1px solid rgba(240, 181, 40, 0.25);
   color: rgb(138, 106, 26);
 }
 [data-row-style="v2"] .tli2-snooze-icon svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   display: block;
 }
 [data-row-style="v2"] .tli2-snooze-icon svg path {
   stroke: currentColor;
   stroke-width: 8px;
   paint-order: stroke fill;
+}
+
+/* Unsnoozed tag: same pale-yellow tag as the snoozed bell above, but wide
+   enough to also carry a "3 mins ago" label -- icon on the left, text on
+   the right, both inside one tag. Demo'd on whichever row is first in the
+   list (see the "Unsnoozed state" block in app.js). Sized down a notch
+   (icon/padding/gap/text) for the same tight-card reason as above. */
+[data-row-style="v2"] .tli2-snooze-icon--unsnoozed {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px 2px 2px;
+}
+[data-row-style="v2"] .tli2-snooze-icon-glyph {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+[data-row-style="v2"] .tli2-snooze-icon-glyph svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+[data-row-style="v2"] .tli2-snooze-icon-glyph svg path {
+  stroke: currentColor;
+  stroke-width: 8px;
+  paint-order: stroke fill;
+}
+[data-row-style="v2"] .tli2-snooze-icon-text {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 /* ---------------------------------------------------------------
@@ -31978,8 +32016,20 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
  * disappeared a third time: it wasn't asked for in chat -- restore
  * from here rather than leaving it reverted.
  *
- * - Gray background (`#E9E9E6`), not the app's warm cream tokens,
- *   which were blending into the page (low contrast).
+ * - Gray background (`#F1EFE7`, was `#E9E9E6`), not the app's warm
+ *   cream tokens, which were blending into the page (low contrast).
+ *   Checked against WCAG AA at this exact shade: the bar's own text
+ *   colours (black `#2A2520` body/button text at 13.2:1, muted
+ *   `#5A5750`/`#635D54` count text and icons at 5.7-6.3:1, and even
+ *   the orange `#8E5F2E` "Select all" label at 4.8:1) all clear the
+ *   4.5:1 text minimum -- no colour changes needed for those. The one
+ *   thing that does NOT clear the 3:1 non-text minimum against this
+ *   background is the checked checkbox's fill, `var(--lite-accent)`
+ *   (`#CF9358`, ~2.3:1) -- but that's the same global accent token
+ *   the real app uses for every checked checkbox everywhere (it was
+ *   already ~2.2:1 against the old background too), not something
+ *   scoped to this bar, so it's left alone rather than hand-picking a
+ *   one-off colour here that would drift from the rest of the app.
  * - Generous padding/gaps -- more breathing room than the real
  *   `.ticket-bulk-bar` (6px 8px / 6px gap).
  * - Buttons: black text/icons (var(--lite-text-primary), the same
@@ -31993,7 +32043,7 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
  * - Rounded corners on the bar itself.
  * ------------------------------------------------------------- */
 [data-row-style="v2"] .ticket-bulk-bar {
-  background: #E9E9E6;
+  background: #F1EFE7;
   /* Top/bottom explicitly set to 8px per request; left/right stay at the
      wider 18px used elsewhere in this bar. */
   padding: 8px 18px;
@@ -32011,26 +32061,23 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   margin-right: -12px;
 }
 
-/* "Select all" + count: bigger text, matching the property buttons'
-   14px rather than the real (~11px) size. */
+/* "Select all" + count: 11px per explicit request (was bigger text
+   matching the property buttons' 14px). */
 [data-row-style="v2"] .ticket-bulk-bar__select-all,
 [data-row-style="v2"] .ticket-bulk-bar__count {
-  font-size: 14px;
+  font-size: 11px;
 }
 
-/* Clear-selection (x) button, wide view: a bit bigger than the real
-   24px/14px `.lite-icon-button--mini`, but pulled back down from an
-   earlier 32px/18px pass -- reads oversized at this width. The narrow
-   (ticket-open) view overrides this again, smaller still -- see the
-   `[data-bulk-action="clear"]` rule below. */
+/* Clear-selection (x) button, wide view: icon/box shrunk to match the
+   11px text above (was 26px/16px alongside the bigger 14px text). */
 [data-row-style="v2"] .ticket-bulk-bar > .lite-icon-button {
-  width: 26px !important;
-  height: 26px !important;
-  min-width: 26px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
 }
 [data-row-style="v2"] .ticket-bulk-bar > .lite-icon-button svg {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
 }
 
 /* Divider right after "Status": a real flex child (not a pseudo-element
@@ -32056,6 +32103,28 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   display: none;
 }
 
+/* Status/Assignee/Folder/Snooze/Export read as one button group, not
+   five separately-spaced actions -- claw back the bar's own 24px gap
+   for this whole cluster. Two tiers, per explicit request:
+   - Status -> divider -> Assignee stays a looser 12px gap: Assignee is
+     "entering" the action group from the Status/divider separator, so
+     that gap reads as a group boundary, not part of the group itself.
+   - Assignee -> Folder -> Snooze -> Export (the actual button group)
+     is pulled in tight to 4px, visually welding those four into one
+     unit -- tighter than the 12px boundary gap above it.
+   Left untouched: the gap before Status, which stays the full 24px --
+   that's the intentional separation from the "Select all"/count group
+   on the other side of the flex spacer. */
+[data-row-style="v2"] .ticket-bulk-bar .tli-bulkbar-divider,
+[data-row-style="v2"] .ticket-bulk-bar .lite-button[data-bulk-action="assignee"] {
+  margin-left: -12px;
+}
+[data-row-style="v2"] .ticket-bulk-bar .lite-button[data-bulk-action="folder"],
+[data-row-style="v2"] .ticket-bulk-bar .lite-button[data-bulk-action="snooze"],
+[data-row-style="v2"] .ticket-bulk-bar .lite-button[data-bulk-action="export"] {
+  margin-left: -20px;
+}
+
 /* Narrow view only (a ticket is open, list column at 340px): shrink the
    clear (x) button back down from the wide view's enlarged 26px/16px.
    It stays in its natural spot right next to "N selected" -- an
@@ -32078,14 +32147,18 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
    currentColor` svgs and pick it up automatically), a neutral border
    to match, and more generous padding to breathe. */
 [data-row-style="v2"] .ticket-bulk-bar .lite-button {
-  background: transparent !important;
+  /* White at 70% opacity, not fully transparent, so each button reads
+     as its own clickable surface floating on the bar's gray background
+     -- per explicit request. */
+  background: rgba(255, 255, 255, 0.7) !important;
   border-color: var(--lite-border) !important;
   color: var(--lite-text-primary);
   /* Vertical padding cut hard -- this, not the bar's own padding, is
      what was actually making the whole bar read as tall. */
   padding: 4px 16px;
   gap: 10px;
-  font-size: 13px;
+  /* 11px per explicit request (was 13px). */
+  font-size: 11px;
 }
 [data-row-style="v2"] .ticket-bulk-bar .lite-button:hover {
   background: var(--lite-bg-primary) !important;
@@ -32093,10 +32166,12 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
 }
 /* Icons are sized via width/height attributes on the <svg> itself
    (14x14), not CSS -- plain width/height here overrides those cleanly
-   since HTML sizing attributes carry no more weight than a UA style. */
+   since HTML sizing attributes carry no more weight than a UA style.
+   Shrunk to 13px to match the 11px text above (was 16px alongside the
+   bigger 13px text). */
 [data-row-style="v2"] .ticket-bulk-bar .lite-button svg {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
 }
 
 /* Narrow view (a ticket is open, 340px list column): the wide view's
@@ -32469,6 +32544,26 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
     var line2 = row.querySelector(".tli2-line2");
     if (!line2) return;
     line2.appendChild(makeEl("span", "tli2-snooze-icon", SNOOZE_BELL_ICON));
+  });
+
+  // --- Unsnoozed state, on the top card ------------------------------------
+  // A plain bell (Phosphor, github.com/phosphor-icons/core, MIT -- the
+  // un-modified "Bell" glyph, not the bell-z used for the snoozed tag
+  // above) paired with a "3 mins ago" label inside the same tag/badge --
+  // icon on the left, text on the right. Targeted at whichever row is
+  // first in the list (no real per-row snooze-history data to drive this
+  // off of).
+  var PLAIN_BELL_ICON =
+    '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M221.84,192A15.8,15.8,0,0,1,208,200H167.19a40,40,0,0,1-78.38,0H48a16,16,0,0,1-13.8-24.06C39.75,166.38,48,139.34,48,104a80,80,0,1,1,160,0c0,35.33,8.26,62.38,13.81,71.94ZM150.62,200H105.38a24,24,0,0,0,45.24,0ZM208,184c-7.73-13.27-16-43.95-16-80a64,64,0,1,0-128,0c0,36.06-8.28,66.74-16,80Z"/></svg>';
+  document.querySelectorAll('[data-row-style="v2"]').forEach(function (scope) {
+    var topRow = scope.querySelector(".tli");
+    if (!topRow) return;
+    var line2 = topRow.querySelector(".tli2-line2");
+    if (!line2) return;
+    var tag = makeEl("span", "tli2-snooze-icon tli2-snooze-icon--unsnoozed", "");
+    tag.appendChild(makeEl("span", "tli2-snooze-icon-glyph", PLAIN_BELL_ICON));
+    tag.appendChild(makeEl("span", "tli2-snooze-icon-text", "3 mins ago"));
+    line2.appendChild(tag);
   });
 
   /*
@@ -32920,7 +33015,6 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
     });
   });
 })();
-
 </script>
 </body>
 </html>
