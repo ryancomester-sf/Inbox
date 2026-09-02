@@ -31529,25 +31529,25 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   padding: 10px 14px;
 }
 
-/* Icon + name line share one row (per the Figma structure wireframe, node
-   161:29) -- the icon-to-text gap that used to live on `.tli` itself (back
-   when the icon sat beside the full two-line body) now lives here instead,
-   same 12px value, just relocated. */
+/* Icon + name line, paired in their own row so the icon centers against
+   just the name line's text (per explicit request) -- the icon is taller
+   than a single line of text, so centering it against the full two-line
+   block (or top-aligning it) both left its visual centre sitting a few px
+   off from the name text's own centre. The icon-to-text gap that used to
+   live on `.tli` itself lives here now instead, same 8px value. */
 [data-row-style="v2"] .tli2-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
 [data-row-style="v2"] .tli2-icon {
   position: relative;
   flex-shrink: 0;
-  /* Sized to sit inline with just the name line (per the wireframe),
-     rather than spanning the full two-line row height. 20px -> 24px -> 34px
-     per explicit requests. */
-  width: 34px;
-  height: 34px;
+  /* 20px -> 24px -> 34px -> 22px -> 28px per explicit requests. */
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -31558,6 +31558,12 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
      why these aren't set as plain `background`/`color` inline styles. */
   background: var(--tli2-channel-bg);
   color: var(--tli2-channel-color);
+  /* Small inset border, per explicit request -- a box-shadow rather than
+     a real `border` so it doesn't add to the icon's own width/height.
+     Same hue as the icon's own per-channel colour (not a darkened
+     variant), but blended down to 50% opacity -- the full-strength colour
+     read as too bright/intense against the icon's pale background tint. */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tli2-channel-color) 50%, transparent);
 }
 
 [data-row-style="v2"] .tli2-icon-channel,
@@ -31565,8 +31571,8 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
 [data-row-style="v2"] .tli2-icon-selected {
   display: none;
   /* Scaled with the `.tli2-icon` circle above, same ratio as before. */
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 [data-row-style="v2"] .tli2-icon-channel svg,
 [data-row-style="v2"] .tli2-icon-hover svg,
@@ -31589,6 +31595,11 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   /* Pure white, not the muted --lite-bg-tertiary hover tint, so the grey
      checkbox outline actually contrasts against its circle. */
   background: #fff;
+  /* Same grey as the checkbox outline itself (and `.tli2-mailbox`'s text),
+     faded to 25% opacity per explicit request -- instead of the base
+     rule's bright per-channel colour, which read as a harsh mismatch next
+     to a plain grey checkbox on a white circle. */
+  box-shadow: inset 0 0 0 1px rgba(90, 87, 80, 0.25);
 }
 
 /* checked (checkbox clicked): filled checkbox in the app's own accent
@@ -31655,7 +31666,10 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  /* 3px -> 8px -> 12px -> 9px -> 4px per explicit requests, for breathing
+     room between the icon/name line (`.tli2-header`) and the subject/
+     preview line below it. */
+  gap: 4px;
 }
 [data-row-style="v2"] .tli2-line1 {
   display: flex;
@@ -31716,6 +31730,10 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   align-items: center;
   gap: 8px;
   min-width: 0;
+  /* No indent of its own -- as `.tli2-body`'s second child, right next to
+     `.tli2-header` (icon + name line), it already starts flush with the
+     icon's own left edge without needing the negative-margin trick this
+     used before header/body were split back apart. */
 }
 [data-row-style="v2"] .tli2-line2-text {
   flex: 1 1 auto;
@@ -32070,6 +32088,29 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
   gap: 24px;
   border-bottom: 1px solid var(--lite-border);
   border-radius: 12px;
+}
+
+/* Status/Assignee/Folder/Snooze/Export, wrapped in their own flex
+   container -- fixes a real bug: with all five buttons as direct
+   children of `.ticket-bulk-bar` (itself `flex-wrap: wrap`), the bar
+   wrapped item-by-item instead of group-by-group. "Status" (right after
+   the spacer) usually still fit on line 1 with the "Select all"/count
+   group, while Assignee/Folder/Snooze wrapped to line 2 and Export alone
+   wrapped to a 3rd line -- one action group fragmented across three rows.
+   Grouping them here means the whole cluster wraps to its own new line as
+   a unit whenever it doesn't fit next to the spacer, and only wraps
+   *within itself* (this container has its own flex-wrap) if even a full
+   line isn't enough room for all five.
+   `gap: inherit` rather than a hardcoded value so the buttons keep
+   whatever spacing `.ticket-bulk-bar` itself is using (24px wide view,
+   12px narrow `.tli-ticket-open` view) without repeating that number
+   here -- the per-button `margin-left` values below still layer on top
+   of it the same as before. */
+[data-row-style="v2"] .ticket-bulk-bar__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: inherit;
 }
 
 /* "Select all" checkbox + label + count + clear(x): tightened back up
@@ -32524,11 +32565,10 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
     line2.appendChild(makeEl("div", "tli2-line2-text", previewHtml));
     if (agentStack) line2.appendChild(agentStack);
 
-    // Icon + name line sit side by side in their own row (per the Figma
-    // structure wireframe, node 161:29); the subject/preview line then
-    // drops full-width below, flush with the icon's own left edge rather
-    // than indented to match the name line's text -- so it's `body`'s
-    // second child alongside `header`, not nested under the icon.
+    // Icon + name line paired in their own row so the icon centers
+    // against just the name line's text, not the full two-line block
+    // (per explicit request); the subject/preview line is `body`'s other
+    // child, so it still starts flush with the icon's own left edge.
     var header = makeEl("div", "tli2-header");
     header.appendChild(icon);
     header.appendChild(line1);
@@ -32624,12 +32664,14 @@ iframe.vds-youtube[data-no-controls] { height: 1000%; }
         '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
       '</button>' +
       '<div class="ticket-bulk-bar__spacer"></div>' +
-      '<button type="button" data-bulk-action="status" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Status</button>' +
-      '<span class="tli-bulkbar-divider" aria-hidden="true"></span>' +
-      '<button type="button" data-bulk-action="assignee" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>Assignee</button>' +
-      '<button type="button" data-bulk-action="folder" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>Folder</button>' +
-      '<button type="button" data-bulk-action="snooze" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Snooze</button>' +
-      '<button type="button" data-bulk-action="export" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Export</button>' +
+      '<div class="ticket-bulk-bar__actions">' +
+        '<button type="button" data-bulk-action="status" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Status</button>' +
+        '<span class="tli-bulkbar-divider" aria-hidden="true"></span>' +
+        '<button type="button" data-bulk-action="assignee" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>Assignee</button>' +
+        '<button type="button" data-bulk-action="folder" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>Folder</button>' +
+        '<button type="button" data-bulk-action="snooze" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Snooze</button>' +
+        '<button type="button" data-bulk-action="export" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Export</button>' +
+      '</div>' +
     "</div>";
 
   document.querySelectorAll('[data-row-style="v2"]').forEach(function (scopeRoot) {

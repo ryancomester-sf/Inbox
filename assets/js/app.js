@@ -282,11 +282,10 @@
     line2.appendChild(makeEl("div", "tli2-line2-text", previewHtml));
     if (agentStack) line2.appendChild(agentStack);
 
-    // Icon + name line sit side by side in their own row (per the Figma
-    // structure wireframe, node 161:29); the subject/preview line then
-    // drops full-width below, flush with the icon's own left edge rather
-    // than indented to match the name line's text -- so it's `body`'s
-    // second child alongside `header`, not nested under the icon.
+    // Icon + name line paired in their own row so the icon centers
+    // against just the name line's text, not the full two-line block
+    // (per explicit request); the subject/preview line is `body`'s other
+    // child, so it still starts flush with the icon's own left edge.
     var header = makeEl("div", "tli2-header");
     header.appendChild(icon);
     header.appendChild(line1);
@@ -382,12 +381,14 @@
         '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
       '</button>' +
       '<div class="ticket-bulk-bar__spacer"></div>' +
-      '<button type="button" data-bulk-action="status" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Status</button>' +
-      '<span class="tli-bulkbar-divider" aria-hidden="true"></span>' +
-      '<button type="button" data-bulk-action="assignee" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>Assignee</button>' +
-      '<button type="button" data-bulk-action="folder" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>Folder</button>' +
-      '<button type="button" data-bulk-action="snooze" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Snooze</button>' +
-      '<button type="button" data-bulk-action="export" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Export</button>' +
+      '<div class="ticket-bulk-bar__actions">' +
+        '<button type="button" data-bulk-action="status" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Status</button>' +
+        '<span class="tli-bulkbar-divider" aria-hidden="true"></span>' +
+        '<button type="button" data-bulk-action="assignee" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>Assignee</button>' +
+        '<button type="button" data-bulk-action="folder" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>Folder</button>' +
+        '<button type="button" data-bulk-action="snooze" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Snooze</button>' +
+        '<button type="button" data-bulk-action="export" class="lite-button lite-button--secondary lite-button--mini"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Export</button>' +
+      '</div>' +
     "</div>";
 
   document.querySelectorAll('[data-row-style="v2"]').forEach(function (scopeRoot) {

@@ -61,25 +61,25 @@
   padding: 10px 14px;
 }
 
-/* Icon + name line share one row (per the Figma structure wireframe, node
-   161:29) -- the icon-to-text gap that used to live on `.tli` itself (back
-   when the icon sat beside the full two-line body) now lives here instead,
-   same 12px value, just relocated. */
+/* Icon + name line, paired in their own row so the icon centers against
+   just the name line's text (per explicit request) -- the icon is taller
+   than a single line of text, so centering it against the full two-line
+   block (or top-aligning it) both left its visual centre sitting a few px
+   off from the name text's own centre. The icon-to-text gap that used to
+   live on `.tli` itself lives here now instead, same 8px value. */
 [data-row-style="v2"] .tli2-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
 [data-row-style="v2"] .tli2-icon {
   position: relative;
   flex-shrink: 0;
-  /* Sized to sit inline with just the name line (per the wireframe),
-     rather than spanning the full two-line row height. 20px -> 24px -> 34px
-     per explicit requests. */
-  width: 34px;
-  height: 34px;
+  /* 20px -> 24px -> 34px -> 22px -> 28px per explicit requests. */
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -90,6 +90,12 @@
      why these aren't set as plain `background`/`color` inline styles. */
   background: var(--tli2-channel-bg);
   color: var(--tli2-channel-color);
+  /* Small inset border, per explicit request -- a box-shadow rather than
+     a real `border` so it doesn't add to the icon's own width/height.
+     Same hue as the icon's own per-channel colour (not a darkened
+     variant), but blended down to 50% opacity -- the full-strength colour
+     read as too bright/intense against the icon's pale background tint. */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tli2-channel-color) 50%, transparent);
 }
 
 [data-row-style="v2"] .tli2-icon-channel,
@@ -97,8 +103,8 @@
 [data-row-style="v2"] .tli2-icon-selected {
   display: none;
   /* Scaled with the `.tli2-icon` circle above, same ratio as before. */
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 [data-row-style="v2"] .tli2-icon-channel svg,
 [data-row-style="v2"] .tli2-icon-hover svg,
@@ -121,6 +127,11 @@
   /* Pure white, not the muted --lite-bg-tertiary hover tint, so the grey
      checkbox outline actually contrasts against its circle. */
   background: #fff;
+  /* Same grey as the checkbox outline itself (and `.tli2-mailbox`'s text),
+     faded to 25% opacity per explicit request -- instead of the base
+     rule's bright per-channel colour, which read as a harsh mismatch next
+     to a plain grey checkbox on a white circle. */
+  box-shadow: inset 0 0 0 1px rgba(90, 87, 80, 0.25);
 }
 
 /* checked (checkbox clicked): filled checkbox in the app's own accent
@@ -187,7 +198,10 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  /* 3px -> 8px -> 12px -> 9px -> 4px per explicit requests, for breathing
+     room between the icon/name line (`.tli2-header`) and the subject/
+     preview line below it. */
+  gap: 4px;
 }
 [data-row-style="v2"] .tli2-line1 {
   display: flex;
@@ -248,6 +262,10 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
+  /* No indent of its own -- as `.tli2-body`'s second child, right next to
+     `.tli2-header` (icon + name line), it already starts flush with the
+     icon's own left edge without needing the negative-margin trick this
+     used before header/body were split back apart. */
 }
 [data-row-style="v2"] .tli2-line2-text {
   flex: 1 1 auto;
@@ -602,6 +620,29 @@
   gap: 24px;
   border-bottom: 1px solid var(--lite-border);
   border-radius: 12px;
+}
+
+/* Status/Assignee/Folder/Snooze/Export, wrapped in their own flex
+   container -- fixes a real bug: with all five buttons as direct
+   children of `.ticket-bulk-bar` (itself `flex-wrap: wrap`), the bar
+   wrapped item-by-item instead of group-by-group. "Status" (right after
+   the spacer) usually still fit on line 1 with the "Select all"/count
+   group, while Assignee/Folder/Snooze wrapped to line 2 and Export alone
+   wrapped to a 3rd line -- one action group fragmented across three rows.
+   Grouping them here means the whole cluster wraps to its own new line as
+   a unit whenever it doesn't fit next to the spacer, and only wraps
+   *within itself* (this container has its own flex-wrap) if even a full
+   line isn't enough room for all five.
+   `gap: inherit` rather than a hardcoded value so the buttons keep
+   whatever spacing `.ticket-bulk-bar` itself is using (24px wide view,
+   12px narrow `.tli-ticket-open` view) without repeating that number
+   here -- the per-button `margin-left` values below still layer on top
+   of it the same as before. */
+[data-row-style="v2"] .ticket-bulk-bar__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: inherit;
 }
 
 /* "Select all" checkbox + label + count + clear(x): tightened back up
