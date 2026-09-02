@@ -194,6 +194,12 @@
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+  /* Stretch to fill the rest of `.tli2-header` (next to the fixed-width
+     icon) -- without this, line1 only sizes to its own content and
+     `.tli2-time`'s `margin-left: auto` below has no spare room to push
+     into, leaving the time stuck right after the mailbox instead of at
+     the row's right edge. */
+  flex: 1 1 auto;
 }
 [data-row-style="v2"] .tli2-name {
   /* 700 -> medium (500) -> semi-bold (600) per explicit requests. */
