@@ -56,17 +56,30 @@
 [data-row-style="v2"] .tli {
   display: flex;
   align-items: center;
-  gap: 12px;
   height: auto;
   min-height: 72px;
   padding: 10px 14px;
 }
 
+/* Icon + name line share one row (per the Figma structure wireframe, node
+   161:29) -- the icon-to-text gap that used to live on `.tli` itself (back
+   when the icon sat beside the full two-line body) now lives here instead,
+   same 12px value, just relocated. */
+[data-row-style="v2"] .tli2-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
 [data-row-style="v2"] .tli2-icon {
   position: relative;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  /* Sized to sit inline with just the name line (per the wireframe),
+     rather than spanning the full two-line row height. 20px -> 24px -> 34px
+     per explicit requests. */
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -83,6 +96,7 @@
 [data-row-style="v2"] .tli2-icon-hover,
 [data-row-style="v2"] .tli2-icon-selected {
   display: none;
+  /* Scaled with the `.tli2-icon` circle above, same ratio as before. */
   width: 20px;
   height: 20px;
 }

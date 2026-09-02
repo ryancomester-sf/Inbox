@@ -282,12 +282,20 @@
     line2.appendChild(makeEl("div", "tli2-line2-text", previewHtml));
     if (agentStack) line2.appendChild(agentStack);
 
+    // Icon + name line sit side by side in their own row (per the Figma
+    // structure wireframe, node 161:29); the subject/preview line then
+    // drops full-width below, flush with the icon's own left edge rather
+    // than indented to match the name line's text -- so it's `body`'s
+    // second child alongside `header`, not nested under the icon.
+    var header = makeEl("div", "tli2-header");
+    header.appendChild(icon);
+    header.appendChild(line1);
+
     var body = makeEl("div", "tli2-body");
-    body.appendChild(line1);
+    body.appendChild(header);
     body.appendChild(line2);
 
     row.innerHTML = "";
-    row.appendChild(icon);
     row.appendChild(body);
   }
 
